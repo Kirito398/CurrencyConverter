@@ -1,7 +1,9 @@
 package ru.biozzlab.domain.interfaces
 
-import ru.biozzlab.domain.models.RatesModel
+import ru.biozzlab.domain.enums.CurrencyEnum
+import ru.biozzlab.domain.models.CurrencyModel
 
 interface MainRepositoryInterface {
-    suspend fun getLatestRates(): RatesModel
+    fun startMonitoringRates()
+    fun getLatestRates(): Map<CurrencyEnum, CurrencyModel>
 }

@@ -1,4 +1,4 @@
-package ru.biozzlab.domain.models
+package ru.biozzlab.data.models
 
 data class RatesModel(
     val rates: Map<String, Double>,

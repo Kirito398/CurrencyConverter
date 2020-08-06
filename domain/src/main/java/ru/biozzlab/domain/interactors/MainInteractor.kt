@@ -1,31 +1,22 @@
 package ru.biozzlab.domain.interactors
 
-import kotlinx.coroutines.*
+import ru.biozzlab.domain.enums.CurrencyEnum
+import ru.biozzlab.domain.interfaces.MainInteractorInterface
 import ru.biozzlab.domain.interfaces.MainRepositoryInterface
-import ru.biozzlab.domain.models.RatesModel
 
-class MainInteractor(private val repository: MainRepositoryInterface) {
-    private lateinit var currentRatesModel: RatesModel
-
-    private val scope = CoroutineScope(SupervisorJob())
-
+class MainInteractor(private val repository: MainRepositoryInterface) : MainInteractorInterface{
     init {
-        startMonitoringRates()
+        repository.startMonitoringRates()
     }
 
-    fun startMonitoringRates() {
-        scope.launch(Dispatchers.IO) {
-            do {
-                currentRatesModel = withContext(Dispatchers.IO) {
-                    repository.getLatestRates()
-                }
+    override fun convertCurrency(from: CurrencyEnum, to: CurrencyEnum, value: Double): Double? {
+        val latestRates = repository.getLatestRates()
+        val fromRate = latestRates[from]?.rate
+        val toRate = latestRates[to]?.rate
 
-                delay(30000)
-            } while (true)
-        }
-    }
+        if (fromRate == null || toRate == null)
+            return null
 
-    fun stopMonitoringRates() {
-        scope.cancel()
+        return (value / fromRate) * toRate
     }
 }

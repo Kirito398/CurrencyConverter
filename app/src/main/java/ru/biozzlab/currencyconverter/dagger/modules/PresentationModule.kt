@@ -6,12 +6,14 @@ import ru.biozzlab.currencyconverter.interfaces.CurrencyContract
 import ru.biozzlab.currencyconverter.interfaces.MainContract
 import ru.biozzlab.currencyconverter.presenters.CurrencyPresenter
 import ru.biozzlab.currencyconverter.presenters.MainPresenter
+import ru.biozzlab.domain.interactors.MainInteractor
+import ru.biozzlab.domain.interfaces.MainInteractorInterface
 
 @Module
 class PresentationModule {
     @Provides
-    fun provideMainPresenter(): MainContract.Presenter {
-        return MainPresenter()
+    fun provideMainPresenter(interactor: MainInteractorInterface): MainContract.Presenter {
+        return MainPresenter(interactor)
     }
 
     @Provides
