@@ -6,26 +6,16 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.currency_item.*
-import ru.biozzlab.currencyconverter.App
 import ru.biozzlab.currencyconverter.R
 import ru.biozzlab.currencyconverter.enums.CurrencyFragmentType
-import ru.biozzlab.currencyconverter.interfaces.CurrencyContract
 import ru.biozzlab.currencyconverter.viewmodels.CurrencyViewModel
 import ru.biozzlab.domain.enums.CurrencyEnum
-import javax.inject.Inject
 
-class CurrencyFragment(private val currency: CurrencyEnum, private val type: CurrencyFragmentType) : Fragment(), CurrencyContract.View {
-    @Inject
-    lateinit var presenter: CurrencyContract.Presenter
-
+class CurrencyFragment(private var currency: CurrencyEnum = CurrencyEnum.EUR, private var type: CurrencyFragmentType = CurrencyFragmentType.FROM) : Fragment() {
     private lateinit var currencyViewModel: CurrencyViewModel
-    private var isCurrencyValueEdit = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,30 +28,22 @@ class CurrencyFragment(private val currency: CurrencyEnum, private val type: Cur
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App.getComponent().injectCurrencyFragment(this)
-
-        presenter.setView(this)
-        presenter.init()
+        init()
+        setListeners()
     }
 
-    override fun onResume() {
-        super.onResume()
+    private fun init() {
+        tvCurrencyType.text = currency.type
+        currencyViewModel = ViewModelProviders.of(activity!!).get(type.type, CurrencyViewModel::class.java)
         currencyViewModel.setCurrencyType(currency)
     }
 
-    override fun init() {
-        tvCurrencyType.text = currency.type
-        currencyViewModel = ViewModelProviders.of(activity!!).get(type.type, CurrencyViewModel::class.java)
-    }
-
-    override fun setListeners() {
-        etCurrencyValue.addTextChangedListener(object : TextWatcher {
+    private fun setListeners() {
+        etCurrencyValue?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
-                isCurrencyValueEdit = false
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                isCurrencyValueEdit = true
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -75,21 +57,16 @@ class CurrencyFragment(private val currency: CurrencyEnum, private val type: Cur
     }
 
     private fun clearValue() {
-        etCurrencyValue.text.clear()
+        etCurrencyValue?.text?.clear()
     }
 
     fun setCurrencyValue(value: Double) {
-        if (isCurrencyValueEdit)
+        if (etCurrencyValue?.isFocused != false)
             return
 
         if (value == 0.0)
             clearValue()
         else
-            etCurrencyValue.setText(value.toString())
-    }
-
-    override fun onPause() {
-        super.onPause()
-        clearValue()
+            etCurrencyValue?.setText(value.toString())
     }
 }
