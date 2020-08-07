@@ -6,15 +6,15 @@ interface MainContract {
     interface View {
         fun init(currencyNameList: Array<CurrencyEnum>)
         fun setListeners()
-        fun setFromCurrencyValue(value: Double)
-        fun setToCurrencyValue(value: Double)
+        fun setFromCurrencyValue(value: String)
+        fun setToCurrencyValue(value: String)
     }
 
     interface Presenter {
         fun setView(view: View)
         fun init()
-        fun onFromCurrencyValueChanged(value: Double)
-        fun onToCurrencyValueChanged(value: Double)
+        fun onFromCurrencyValueChanged(value: String)
+        fun onToCurrencyValueChanged(value: String)
         fun onFromCurrencyTypeChanged(type: CurrencyEnum)
         fun onToCurrencyTypeChanged(type: CurrencyEnum)
     }

@@ -23,14 +23,22 @@ class MainPresenter(private val interactor: MainInteractorInterface) : MainContr
         view.setListeners()
     }
 
-    override fun onFromCurrencyValueChanged(value: Double) {
-        val res = interactor.convertCurrency(fromCurrencyType, toCurrencyType, value) ?: return
-        view.setToCurrencyValue(res)
+    override fun onFromCurrencyValueChanged(value: String) {
+        val dValue = if (value.isEmpty()) 0.0 else value.toDouble()
+        val res = interactor.convertCurrency(fromCurrencyType, toCurrencyType, dValue) ?: return
+
+        val sValue = if (res == 0.0) "" else "+$res"
+
+        view.setToCurrencyValue(sValue)
     }
 
-    override fun onToCurrencyValueChanged(value: Double) {
-        val res = interactor.convertCurrency(toCurrencyType, fromCurrencyType, value) ?: return
-        view.setFromCurrencyValue(res)
+    override fun onToCurrencyValueChanged(value: String) {
+        val dValue = if (value.isEmpty()) 0.0 else value.toDouble()
+        val res = interactor.convertCurrency(toCurrencyType, fromCurrencyType, dValue) ?: return
+
+        val sValue = if (res == 0.0) "" else "-$res"
+
+        view.setFromCurrencyValue(sValue)
     }
 
     override fun onFromCurrencyTypeChanged(type: CurrencyEnum) {

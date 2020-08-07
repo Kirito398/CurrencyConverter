@@ -1,24 +1,49 @@
 package ru.biozzlab.currencyconverter.ui.adapters
 
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import ru.biozzlab.currencyconverter.enums.CurrencyFragmentType
-import ru.biozzlab.currencyconverter.ui.fragments.CurrencyFragment
+import android.content.Context
+import android.view.View
+import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.viewpager.widget.PagerAdapter
+import ru.biozzlab.currencyconverter.interfaces.listeners.OnCurrencyValueChangeListener
+import ru.biozzlab.currencyconverter.ui.CurrencyItem
 import ru.biozzlab.domain.enums.CurrencyEnum
 
-class SwipeCurrencyFragmentAdapter(currencyList: Array<CurrencyEnum>, fragmentManager: FragmentManager, type: CurrencyFragmentType) :
-    FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-    private val fragmentList = mutableListOf<Fragment>()
+class SwipeCurrencyFragmentAdapter(private val currencyList: Array<CurrencyEnum>, private val context: Context) :
+    PagerAdapter() {
+    private val itemList = mutableListOf<CurrencyItem>()
+    private var onCurrencyValueChangeListener: OnCurrencyValueChangeListener? = null
 
-    init {
-        for (currency in currencyList)
-            fragmentList.add(CurrencyFragment(currency, type))
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val item = CurrencyItem(currencyList[position], container, context)
+        item.setOnCurrencyValueChangeListener(onCurrencyValueChangeListener)
+
+        if (itemList.size -1 < position)
+            itemList.add(item)
+        else
+            itemList[position] = item
+
+        container.addView(item.getView())
+
+        return item.getView()
     }
 
-    override fun getItem(position: Int): Fragment {
-        return fragmentList[position]
+    fun setOnCurrencyValueChangeListener(listener: OnCurrencyValueChangeListener) {
+        this.onCurrencyValueChangeListener = listener
+
+        for (item in itemList)
+            item.setOnCurrencyValueChangeListener(listener)
     }
 
-    override fun getCount() = fragmentList.size
+    fun getItem(position: Int) = itemList[position]
+
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
+        return view == `object`
+    }
+
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        container.removeView(`object` as ConstraintLayout)
+    }
+
+    override fun getCount(): Int = currencyList.size
 }
